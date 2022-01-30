@@ -1,19 +1,21 @@
 package com.log.eventscommunities.presentation.screens.auth
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.log.eventscommunities.domain.repository.AuthRepository
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import com.log.eventscommunities.R
+import com.log.eventscommunities.presentation.screens.auth.components.Login
 import com.log.eventscommunities.presentation.screens.auth.components.RegisterWidget
-import com.log.eventscommunities.presentation.util.common_composables.text_field.QTextField
-import com.log.eventscommunities.presentation.util.common_composables.text_field.TextFieldState
+import com.log.eventscommunities.presentation.screens.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -23,13 +25,57 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun AuthScreen(
     navigator: DestinationsNavigator,
-    viewModel: AuthViewModel = hiltViewModel(),
 ) {
-  /*  val state by remember { mutableStateOf(false) }
+    var isLoginScreen by remember { mutableStateOf(true) }
 
-    AnimatedContent(targetState = state) {
+    BackHandler(!isLoginScreen) {
+        isLoginScreen = !isLoginScreen
+    }
 
-    }*/
-    RegisterWidget()
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(id = R.color.creme))
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .aspectRatio(1f)
+                .align(Alignment.TopCenter),
+            painter = painterResource(id = R.drawable.ic_auth_screen_splash),
+            contentDescription = "splash image",
+            contentScale = ContentScale.Crop,
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.6f)
+                .align(Alignment.BottomCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AnimatedContent(
+                targetState = isLoginScreen,
+                transitionSpec = {
+                    if (targetState) {
+                        slideInHorizontally { height -> -height } + fadeIn() with
+                                slideOutHorizontally { height -> height } + fadeOut()
+                    } else {
+                        slideInHorizontally { height -> height } + fadeIn() with
+                                slideOutHorizontally { height -> -height } + fadeOut()
+                    }.using(
+                        SizeTransform(clip = false)
+                    )
+                }
+            ) { targetState ->
+                if (targetState) {
+                    Login(
+                        navigateToHome = { navigator.navigate(HomeScreenDestination()) },
+                        goToRegister = { isLoginScreen = false }
+                    )
+                } else {
+                    RegisterWidget(navigateToHome = { navigator.navigate(HomeScreenDestination()) })
+                }
+            }
+        }
+    }
 }

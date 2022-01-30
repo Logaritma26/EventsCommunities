@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.log.eventscommunities.domain.use_case.auth.RegisterUseCase
 import com.log.eventscommunities.domain.use_case.auth.SignInUseCase
+import com.log.eventscommunities.presentation.screens.auth.components.LoginState
 import com.log.eventscommunities.presentation.screens.auth.components.RegisterState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,22 +21,26 @@ class AuthViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val registerUseCase: RegisterUseCase,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     var registerState by mutableStateOf(RegisterState())
         private set
 
-   /* fun signIn(email: String, password: String) {
+    var loginState by mutableStateOf(LoginState())
+        private set
+
+    fun signIn(email: String, password: String) {
         viewModelScope.launch {
             signInUseCase(email, password).onEach {
-                registerState = registerState.copy(registeringState = it)
+                loginState = loginState.copy(loginState = it)
             }.launchIn(viewModelScope)
         }
-    }*/
+    }
 
     fun register(email: String, password: String) {
         viewModelScope.launch {
             registerUseCase(email, password).onEach {
+                Timber.d("called state from viewmodelq: $it")
                 registerState = registerState.copy(registeringState = it)
             }.launchIn(viewModelScope)
         }

@@ -9,7 +9,7 @@ class RetypeState(
     validator = ::isFieldValid,
     errorFor = ::fieldValidationError,
     pHint = hint,
-    retype = retype
+    retype = retype,
 )
 
 private fun fieldValidationError(password: String): String {
