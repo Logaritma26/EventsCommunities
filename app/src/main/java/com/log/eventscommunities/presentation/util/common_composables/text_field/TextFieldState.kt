@@ -5,11 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 open class TextFieldState(
-    private val validator: (String) -> Boolean = { true },
+    private val validator: (String, String?) -> Boolean = { _, _ -> true },
     private val errorFor: (String) -> String = { "" },
     private var pHint: String? = null,
+    var retype: String? = null,
 ) {
-    var isFocusedDirty: Boolean by mutableStateOf(false)
+    private var isFocusedDirty: Boolean by mutableStateOf(false)
     var isFocused: Boolean by mutableStateOf(false)
     private var displayErrors: Boolean by mutableStateOf(false)
 
@@ -25,7 +26,7 @@ open class TextFieldState(
         if (focused) isFocusedDirty = true
     }
 
-    fun enableShowErrors() {
+    private fun enableShowErrors() {
         if (isFocusedDirty) {
             displayErrors = true
         }
@@ -33,8 +34,18 @@ open class TextFieldState(
 
     fun showErrors() = !isValid && displayErrors
 
+    fun validate(): Boolean {
+        val res = validator(text, retype)
+        if (res) {
+            displayErrors = false
+        } else {
+            enableShowErrors()
+        }
+        return res
+    }
+
     open val isValid: Boolean
-        get() = validator(text)
+        get() = validator(text, retype)
 
     open fun getError(): String {
         return if (showErrors()) {

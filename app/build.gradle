@@ -5,6 +5,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs'
     id 'kotlin-parcelize'
+    id 'com.google.gms.google-services'
     id 'com.google.devtools.ksp' version '1.6.10-1.0.2'
 }
 

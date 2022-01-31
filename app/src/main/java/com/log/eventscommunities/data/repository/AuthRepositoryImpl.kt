@@ -2,7 +2,6 @@ package com.log.eventscommunities.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.log.eventscommunities.di.DefaultDispatcher
 import com.log.eventscommunities.di.IoDispatcher
 import com.log.eventscommunities.domain.repository.AuthRepository
 import com.log.eventscommunities.domain.wrappers.Resource
@@ -17,10 +16,9 @@ import kotlin.coroutines.suspendCoroutine
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : AuthRepository {
 
-    override suspend fun logIn(
+    override suspend fun signIn(
         email: String,
         password: String,
     ): Flow<Resource<FirebaseUser>> = flow {
@@ -42,7 +40,7 @@ class AuthRepositoryImpl @Inject constructor(
     }.flowOn(ioDispatcher)
 
 
-    override suspend fun logOut() = auth.signOut()
+    override suspend fun signOut() = auth.signOut()
 
     override suspend fun register(
         email: String,
@@ -69,4 +67,5 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun isAuthenticated(): Boolean = auth.currentUser != null
 
+    // TODO add auth flow as stream via listener
 }

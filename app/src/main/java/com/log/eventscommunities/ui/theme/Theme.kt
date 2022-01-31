@@ -27,20 +27,30 @@ private val LightColorPalette = lightColors(
     */
 )
 
+
+val qThemeColors = lightColors(
+    primary = CranePrimary800,
+    secondary = CraneRed,
+    surface = White,
+    onSurface = CranePrimary900,
+    primaryVariant = CranePrimary700,
+)
+
+
 @Composable
 fun EventsCommunitiesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
-    val colors = if (darkTheme) {
+    /*val colors = if (darkTheme) {
         DarkColorPalette
     } else {
         LightColorPalette
-    }
+    }*/
 
     MaterialTheme(
-        colors = colors,
-        typography = Typography,
+        colors = qThemeColors,
+        typography = qTypography,
         shapes = Shapes,
         content = content
     )
