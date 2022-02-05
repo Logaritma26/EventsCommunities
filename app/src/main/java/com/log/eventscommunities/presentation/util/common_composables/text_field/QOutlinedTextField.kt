@@ -16,7 +16,7 @@ import com.log.eventscommunities.presentation.util.common_composables.TooltipIco
 
 @ExperimentalMaterialApi
 @Composable
-fun WTextField(
+fun QTextField(
     modifier: Modifier,
     state: TextFieldState,
     onSearchCallback: (String) -> Unit = {},
@@ -24,7 +24,7 @@ fun WTextField(
 ) {
     var isErrorExpanded by remember { mutableStateOf(false) }
 
-    TextField(
+    OutlinedTextField(
         modifier = modifier.then(
             Modifier
                 .onFocusChanged {

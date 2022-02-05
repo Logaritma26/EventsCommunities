@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 open class TextFieldState(
-    private val validator: (String, String?) -> Boolean = { _, _ -> true },
+    private val validator: (String, String?) -> Boolean = { text, _ -> text.isNotBlank() && text.isNotEmpty() },
     private val errorFor: (String) -> String = { "" },
     private var pHint: String? = null,
     var retype: String? = null,
