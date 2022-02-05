@@ -63,7 +63,7 @@ class AuthRepositoryImpl @Inject constructor(
         emit(res)
     }.flowOn(ioDispatcher)
 
-    override suspend fun fetchUser(): FirebaseUser = auth.currentUser!!
+    override fun fetchUser(): FirebaseUser? = auth.currentUser
 
     override fun isAuthenticated(): Boolean = auth.currentUser != null
 

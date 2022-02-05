@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.log.eventscommunities.domain.use_case.auth.FetchUserUseCase
 import com.log.eventscommunities.domain.use_case.auth.RegisterUseCase
 import com.log.eventscommunities.domain.use_case.auth.SignInUseCase
 import com.log.eventscommunities.presentation.screens.auth.components.LoginState
@@ -13,15 +14,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val registerUseCase: RegisterUseCase,
+    private val fetchUserUseCase: FetchUserUseCase,
+) : ViewModel() {
 
-    ) : ViewModel() {
+    var authState by mutableStateOf(AuthState())
+        private set
 
     var registerState by mutableStateOf(RegisterState())
         private set
@@ -40,9 +43,15 @@ class AuthViewModel @Inject constructor(
     fun register(email: String, password: String) {
         viewModelScope.launch {
             registerUseCase(email, password).onEach {
-                Timber.d("called state from viewmodelq: $it")
                 registerState = registerState.copy(registeringState = it)
             }.launchIn(viewModelScope)
         }
     }
+
+    fun checkAuthState() {
+        val user = fetchUserUseCase()
+        val isAuthenticated = user != null
+        authState = AuthState(isAuthenticated = isAuthenticated, isLoading = false)
+    }
+
 }

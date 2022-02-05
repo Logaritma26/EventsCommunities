@@ -12,7 +12,7 @@ interface AuthRepository {
 
     suspend fun register(email: String, password: String): Flow<Resource<FirebaseUser>>
 
-    suspend fun fetchUser(): FirebaseUser
+    fun fetchUser(): FirebaseUser?
 
     fun isAuthenticated(): Boolean
 

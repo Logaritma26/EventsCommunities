@@ -5,28 +5,40 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.log.eventscommunities.R
 import com.log.eventscommunities.presentation.screens.auth.components.Login
 import com.log.eventscommunities.presentation.screens.auth.components.RegisterWidget
 import com.log.eventscommunities.presentation.screens.destinations.HomeScreenDestination
+import com.log.eventscommunities.presentation.util.common_composables.LoadingWidget
+import com.log.eventscommunities.ui.theme.Creme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
-@Destination(start = true)
+@Destination
 @Composable
 fun AuthScreen(
     navigator: DestinationsNavigator,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     var isLoginScreen by remember { mutableStateOf(true) }
+    val navigateToHome = {
+        navigator.navigate(HomeScreenDestination())
+    }
+    val state = viewModel.authState
+    viewModel.checkAuthState()
+
+    if (state.isAuthenticated) {
+        navigateToHome()
+    }
 
     BackHandler(!isLoginScreen) {
         isLoginScreen = !isLoginScreen
@@ -35,7 +47,7 @@ fun AuthScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.creme))
+            .background(color = Creme)
     ) {
         Image(
             modifier = Modifier
@@ -69,7 +81,7 @@ fun AuthScreen(
             ) { targetState ->
                 if (targetState) {
                     Login(
-                        navigateToHome = { navigator.navigate(HomeScreenDestination()) },
+                        navigateToHome = { navigateToHome() },
                         goToRegister = { isLoginScreen = false }
                     )
                 } else {
@@ -77,5 +89,14 @@ fun AuthScreen(
                 }
             }
         }
+
+        LoadingWidget(state = state.isLoading)
     }
+
+
 }
+
+data class AuthState(
+    val isAuthenticated: Boolean = false,
+    val isLoading: Boolean = true,
+)

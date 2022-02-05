@@ -15,4 +15,8 @@ val CranePrimary700 = Color(0xFF720D5D)
 val CranePrimary800 = Color(0xFF5D1049)
 val CranePrimary900 = Color(0xFF4E0D3A)
 
+
+val GreyBlur = Color(0xCCFBF3E4)
+
+val Creme = Color(0xFFFBF3E4)
 val White = Color.White
