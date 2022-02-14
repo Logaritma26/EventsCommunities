@@ -88,7 +88,7 @@ fun RegisterWidget(
 
         AnimatedContent(targetState = state.registeringState) { targetState ->
             when (targetState) {
-                is Loading<FirebaseUser> -> {
+                is Loading -> {
                     CircularProgressIndicator()
                     Timber.d("state: loading")
                 }
@@ -101,7 +101,7 @@ fun RegisterWidget(
                     navigateToHome()
                     Timber.d("state: success")
                 }
-                is Error<FirebaseUser> -> {
+                is Error -> {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -109,7 +109,7 @@ fun RegisterWidget(
                     ) {
                         Text(
                             modifier = Modifier.padding(12.dp),
-                            text = targetState.message!!,
+                            text = targetState.exception?.localizedMessage ?: "Error occured",
                         )
                     }
                     Timber.d("state: error")

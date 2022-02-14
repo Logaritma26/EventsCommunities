@@ -15,12 +15,13 @@ class PostEventUseCase @Inject constructor(
         val data = hashMapOf(
             "title" to event.title,
             "description" to event.description,
-            "date" to event.date,
             "location" to event.location,
-            "organizer" to event.organizer,
-            "organizerName" to event.organizerName,
+            "tag" to event.tag,
+            "time" to event.time,
+            "organizer" to event.organizer.organizer,
+            "organizerName" to event.organizer.organizerName,
         )
-        Timber.d("asdf organizer name: ${event.organizerName}")
+        Timber.d("asdf organizer name: ${event.organizer.organizerName}")
         return repository.postEvent(data = data)
     }
 }

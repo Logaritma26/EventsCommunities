@@ -91,6 +91,7 @@ fun AuthScreen(
         }
 
         LoadingWidget(state = state.isLoading)
+
     }
 
 

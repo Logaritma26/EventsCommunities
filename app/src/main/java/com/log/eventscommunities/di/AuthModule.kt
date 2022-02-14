@@ -26,16 +26,4 @@ object AuthModule {
         ioDispatcher = ioDispatcher,
     )
 
-    @Provides
-    @Singleton
-    fun provideSignInUseCase(
-        repository: AuthRepository,
-    ) = SignInUseCase(repository)
-
-    @Provides
-    @Singleton
-    fun provideRegisterUseCase(
-        repository: AuthRepository,
-    ) = RegisterUseCase(repository)
-
 }

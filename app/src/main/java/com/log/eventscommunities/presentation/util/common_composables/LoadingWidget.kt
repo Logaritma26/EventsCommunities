@@ -15,12 +15,14 @@ import androidx.compose.ui.unit.dp
 fun BoxScope.LoadingWidget(
     state: Boolean
 ) {
-    AnimatedVisibility(visible = state) {
+    AnimatedVisibility(
+        modifier = Modifier.align(Alignment.Center),
+        visible = state,
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
-                .aspectRatio(1.30f)
-                .align(Alignment.Center),
+                .aspectRatio(1.30f),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

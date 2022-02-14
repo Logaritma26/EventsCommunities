@@ -16,4 +16,7 @@ interface AuthRepository {
 
     fun isAuthenticated(): Boolean
 
+    fun sendVerification()
+
+    fun reloadAuth()
 }
