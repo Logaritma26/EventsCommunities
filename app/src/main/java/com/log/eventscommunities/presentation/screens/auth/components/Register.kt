@@ -1,39 +1,36 @@
 package com.log.eventscommunities.presentation.screens.auth.components
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.firebase.auth.FirebaseUser
-import com.log.eventscommunities.domain.wrappers.Resource
-import com.log.eventscommunities.domain.wrappers.Resource.*
-import com.log.eventscommunities.presentation.screens.auth.AuthViewModel
+import com.log.eventscommunities.presentation.screens.auth.AuthState
 import com.log.eventscommunities.presentation.util.common_composables.text_field.QTextField
 import com.log.eventscommunities.presentation.util.common_composables.text_field.TextFieldState
 import com.log.eventscommunities.presentation.util.common_composables.text_field.text_field_states.EmailState
 import com.log.eventscommunities.presentation.util.common_composables.text_field.text_field_states.PasswordState
 import com.log.eventscommunities.presentation.util.common_composables.text_field.text_field_states.RetypeState
-import timber.log.Timber
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun RegisterWidget(
-    viewModel: AuthViewModel = hiltViewModel(),
-    navigateToHome: () -> Unit,
+fun Register(
+    register: (String, String) -> Unit,
+    userAuthState: AuthState,
 ) {
-    val state = viewModel.registerState
-
+    val state by remember { mutableStateOf(RegisterState()) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,15 +67,10 @@ fun RegisterWidget(
         Button(
             modifier = Modifier.padding(8.dp),
             onClick = {
-                val res = validated(
-                    emailState = state.emailState,
-                    passwordState = state.passwordState,
-                    retypeState = state.retypeState,
-                )
-                if (res) {
-                    viewModel.register(
-                        email = state.emailState.text,
-                        password = state.passwordState.text,
+                if (state.validated()) {
+                    register(
+                        state.emailState.text,
+                        state.passwordState.text,
                     )
                 }
             },
@@ -86,68 +78,43 @@ fun RegisterWidget(
             Text("Sign Up")
         }
 
-        AnimatedContent(targetState = state.registeringState) { targetState ->
-            when (targetState) {
-                is Loading -> {
-                    CircularProgressIndicator()
-                    Timber.d("state: loading")
-                }
-                is Success<FirebaseUser> -> {
-                    resetFields(
-                        emailState = state.emailState,
-                        passwordState = state.passwordState,
-                        retypeState = state.retypeState,
-                    )
-                    navigateToHome()
-                    Timber.d("state: success")
-                }
-                is Error -> {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 42.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(12.dp),
-                            text = targetState.exception?.localizedMessage ?: "Error occured",
-                        )
-                    }
-                    Timber.d("state: error")
-                }
-                else -> {
-                    Timber.d("state: else")
-                }
+        AnimatedVisibility(visible = userAuthState.isError) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                elevation = 6.dp,
+            ) {
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = userAuthState.errorMessage ?: "Error occured",
+                )
             }
+        }
+
+        if (userAuthState.isAuthenticated()) {
+            state.resetFields()
         }
     }
 }
 
-private fun resetFields(
-    emailState: TextFieldState,
-    passwordState: TextFieldState,
-    retypeState: TextFieldState,
-) {
-    emailState.text = ""
-    passwordState.text = ""
-    retypeState.text = ""
-}
-
-private fun validated(
-    emailState: TextFieldState,
-    passwordState: TextFieldState,
-    retypeState: TextFieldState,
-): Boolean {
-    retypeState.retype = passwordState.text
-    return emailState.validate() && passwordState.validate() && retypeState.validate()
-}
-
-data class RegisterState(
+private data class RegisterState(
     val emailState: TextFieldState = EmailState(hint = "Email"),
     val passwordState: TextFieldState = PasswordState(hint = "Password"),
     val retypeState: TextFieldState = RetypeState(
         hint = "Retype Password",
         retype = "",
     ),
-    val registeringState: Resource<FirebaseUser> = Initial(),
-)
+) {
+    fun validated(): Boolean {
+        retypeState.retype = passwordState.text
+        return emailState.validate() && passwordState.validate() && retypeState.validate()
+    }
+
+    fun resetFields() {
+        emailState.text = ""
+        passwordState.text = ""
+        retypeState.text = ""
+    }
+}
 

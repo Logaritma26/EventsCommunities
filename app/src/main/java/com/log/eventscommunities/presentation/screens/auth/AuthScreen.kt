@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.firebase.auth.FirebaseUser
 import com.log.eventscommunities.R
 import com.log.eventscommunities.presentation.screens.auth.components.Login
-import com.log.eventscommunities.presentation.screens.auth.components.RegisterWidget
+import com.log.eventscommunities.presentation.screens.auth.components.Register
 import com.log.eventscommunities.presentation.screens.destinations.HomeScreenDestination
 import com.log.eventscommunities.presentation.util.common_composables.LoadingWidget
 import com.log.eventscommunities.ui.theme.Creme
@@ -30,16 +31,15 @@ fun AuthScreen(
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
     var isLoginScreen by remember { mutableStateOf(true) }
-    val navigateToHome = {
+    val state = viewModel.authState
+
+    LaunchedEffect(key1 = true) {
+        viewModel.checkAuthState()
+    }
+
+    if (state.isAuthenticated()) {
         navigator.navigate(HomeScreenDestination())
     }
-    val state = viewModel.authState
-    viewModel.checkAuthState()
-
-    if (state.isAuthenticated) {
-        navigateToHome()
-    }
-
     BackHandler(!isLoginScreen) {
         isLoginScreen = !isLoginScreen
     }
@@ -81,23 +81,37 @@ fun AuthScreen(
             ) { targetState ->
                 if (targetState) {
                     Login(
-                        navigateToHome = { navigateToHome() },
-                        goToRegister = { isLoginScreen = false }
+                        signIn = { email, passwd ->
+                            viewModel.signIn(
+                                email = email,
+                                password = passwd,
+                            )
+                        },
+                        goToRegister = { isLoginScreen = false },
+                        userAuthState = state,
                     )
                 } else {
-                    RegisterWidget(navigateToHome = { navigator.navigate(HomeScreenDestination()) })
+                    Register(
+                        userAuthState = state,
+                        register = { email, passwd ->
+                            viewModel.register(
+                                email = email,
+                                password = passwd,
+                            )
+                        }
+                    )
                 }
             }
         }
-
         LoadingWidget(state = state.isLoading)
-
     }
-
-
 }
 
 data class AuthState(
-    val isAuthenticated: Boolean = false,
     val isLoading: Boolean = true,
-)
+    val userState: FirebaseUser? = null,
+    val isError: Boolean = false,
+    val errorMessage: String? = null,
+) {
+    fun isAuthenticated(): Boolean = userState != null
+}

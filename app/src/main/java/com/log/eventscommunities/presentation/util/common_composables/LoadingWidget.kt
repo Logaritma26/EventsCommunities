@@ -1,6 +1,8 @@
 package com.log.eventscommunities.presentation.util.common_composables
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -18,6 +20,8 @@ fun BoxScope.LoadingWidget(
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.Center),
         visible = state,
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
         Card(
             modifier = Modifier
