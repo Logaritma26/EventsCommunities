@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.log.eventscommunities.domain.wrappers.Resource
+import com.log.eventscommunities.domain.wrappers.Resource.*
 import com.log.eventscommunities.presentation.screens.auth.AuthViewModel
 import com.log.eventscommunities.presentation.util.common_composables.text_field.QTextField
 import com.log.eventscommunities.presentation.util.common_composables.text_field.TextFieldState
@@ -96,11 +97,11 @@ fun Login(
 
         AnimatedContent(targetState = state.loginState) { targetState ->
             when (targetState) {
-                is Resource.Loading<FirebaseUser> -> {
+                is Loading -> {
                     CircularProgressIndicator()
                     Timber.d("state: loading")
                 }
-                is Resource.Success<FirebaseUser> -> {
+                is Success<FirebaseUser> -> {
                     resetFields(
                         emailState = state.emailState,
                         passwordState = state.passwordState,
@@ -108,7 +109,7 @@ fun Login(
                     navigateToHome()
                     Timber.d("state: success")
                 }
-                is Resource.Error<FirebaseUser> -> {
+                is Error -> {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -116,7 +117,7 @@ fun Login(
                     ) {
                         Text(
                             modifier = Modifier.padding(12.dp),
-                            text = targetState.message!!,
+                            text = targetState.exception?.localizedMessage ?: "Error occured",
                         )
                     }
                     Timber.d("state: error")
@@ -145,5 +146,5 @@ private fun validated(
 data class LoginState(
     val emailState: TextFieldState = EmailState(hint = "Email"),
     val passwordState: TextFieldState = PasswordState(hint = "Password"),
-    val loginState: Resource<FirebaseUser> = Resource.Initial(),
+    val loginState: Resource<FirebaseUser> = Initial(),
 )

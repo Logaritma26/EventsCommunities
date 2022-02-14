@@ -28,11 +28,7 @@ class AuthRepositoryImpl @Inject constructor(
                 if (it.isSuccessful) {
                     coroutine.resume(Resource.Success(it.result?.user))
                 } else {
-                    coroutine.resume(
-                        Resource.Error(
-                            it.exception?.localizedMessage ?: "Something go wrong!"
-                        )
-                    )
+                    coroutine.resume(Resource.Error(exception = it.exception))
                 }
             }
         }
@@ -52,11 +48,7 @@ class AuthRepositoryImpl @Inject constructor(
                 if (it.isSuccessful) {
                     coroutine.resume(Resource.Success(it.result?.user))
                 } else {
-                    coroutine.resume(
-                        Resource.Error(
-                            it.exception?.localizedMessage ?: "Something go wrong!"
-                        )
-                    )
+                    coroutine.resume(Resource.Error(exception = it.exception))
                 }
             }
         }
@@ -67,5 +59,15 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun isAuthenticated(): Boolean = auth.currentUser != null
 
-    // TODO add auth flow as stream via listener
+    override fun sendVerification() {
+        auth.currentUser?.sendEmailVerification()
+    }
+
+    override fun reloadAuth() {
+        auth.currentUser?.let {
+            if(!it.isEmailVerified) {
+                it.reload()
+            }
+        }
+    }
 }

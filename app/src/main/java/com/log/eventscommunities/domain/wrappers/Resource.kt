@@ -1,11 +1,24 @@
 package com.log.eventscommunities.domain.wrappers
 
-sealed class Resource<T>(
+sealed class Resource<out T: Any>(
     val data: T? = null,
-    val message: String? = null,
+    val exception: Throwable? = null,
+    val progress: Double? = null,
 ) {
-    class Initial<T> : Resource<T>()
-    class Loading<T>(data: T? = null) : Resource<T>(data)
-    class Success<T>(data: T? = null) : Resource<T>(data)
-    class Error<T>(message: String? = null, data: T? = null) : Resource<T>(data, message)
+    class Initial : Resource<Nothing>()
+    class Loading(progress: Double? = null) : Resource<Nothing>(progress = progress)
+    class Success<T: Any>(data: T? = null) : Resource<T>(data = data)
+    class Error(exception: Throwable? = null) : Resource<Nothing>(exception = exception)
+}
+
+fun <T : Any> Resource<T>.isSuccess(): Boolean {
+    return this is Resource.Success<T>
+}
+
+fun <T : Any> Resource<T>.isFailure(): Boolean {
+    return this is Resource.Error
+}
+
+fun <T : Any> Resource<T>.isLoading(): Boolean {
+    return this is Resource.Loading
 }
