@@ -1,4 +1,4 @@
-package com.log.eventscommunities.domain.use_case.home
+package com.log.eventscommunities.domain.use_case.event
 
 import com.log.eventscommunities.domain.model.Event
 import javax.inject.Inject

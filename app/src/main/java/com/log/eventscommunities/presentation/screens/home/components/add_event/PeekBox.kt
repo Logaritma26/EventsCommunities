@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseUser
 import com.log.eventscommunities.presentation.util.common_composables.OCIconButton
 
 @ExperimentalAnimationApi
@@ -17,6 +18,7 @@ import com.log.eventscommunities.presentation.util.common_composables.OCIconButt
 fun PeekBox(
     onClickCollapse: () -> Unit,
     isCollapsed: Boolean,
+    user: FirebaseUser?,
 ) {
     Box(
         modifier = Modifier
@@ -26,12 +28,28 @@ fun PeekBox(
     ) {
         Text(
             modifier = Modifier.align(Alignment.CenterStart),
-            text = "Add New Event",
+            text = getText(user),
         )
         OCIconButton(
             modifier = Modifier.align(Alignment.CenterEnd),
             state = isCollapsed,
             onClick = onClickCollapse
         )
+    }
+}
+
+private fun getText(
+    user: FirebaseUser?
+): String {
+    return when {
+        user == null -> {
+            "Log in to create event!"
+        }
+        !user.isEmailVerified -> {
+            "Verify your account to create event!"
+        }
+        else -> {
+            "Add New Event"
+        }
     }
 }

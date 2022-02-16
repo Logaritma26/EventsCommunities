@@ -5,10 +5,10 @@ sealed class Resource<out T: Any>(
     val exception: Throwable? = null,
     val progress: Double? = null,
 ) {
-    class Initial : Resource<Nothing>()
-    class Loading(progress: Double? = null) : Resource<Nothing>(progress = progress)
-    class Success<T: Any>(data: T? = null) : Resource<T>(data = data)
-    class Error(exception: Throwable? = null) : Resource<Nothing>(exception = exception)
+    class Initial<T : Any> : Resource<T>()
+    class Loading<T : Any>(progress: Double? = null) : Resource<T>(progress = progress)
+    class Success<T : Any>(data: T? = null) : Resource<T>(data = data)
+    class Error<T : Any>(exception: Throwable? = null) : Resource<T>(exception = exception)
 }
 
 fun <T : Any> Resource<T>.isSuccess(): Boolean {

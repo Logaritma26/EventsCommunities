@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,8 +18,9 @@ import java.util.*
 
 @Composable
 fun DateSelector(
-    selected: MutableState<Boolean>,
-    date: MutableState<Long>,
+    selected: Boolean,
+    date: Long,
+    onChange: (Boolean, Long) -> Unit,
 ) {
     val context = LocalContext.current
     Column(
@@ -31,8 +31,8 @@ fun DateSelector(
     ) {
         Text(
             text = dateText(
-                selected = selected.value,
-                date = date.value,
+                selected = selected,
+                date = date,
             ),
             textAlign = TextAlign.Center,
         )
@@ -40,8 +40,7 @@ fun DateSelector(
         Button(onClick = {
             openDialog(
                 context = context,
-                date = date,
-                dateSelectionState = selected,
+                onChange = onChange,
             )
         }) {
             Text(text = "Select Date")
@@ -63,8 +62,7 @@ private fun dateText(selected: Boolean, date: Long): String {
 
 private fun openDialog(
     context: Context,
-    date: MutableState<Long>,
-    dateSelectionState: MutableState<Boolean>,
+    onChange: (Boolean, Long) -> Unit,
 ) {
     val currentDateTime = Calendar.getInstance()
     val startYear = currentDateTime.get(Calendar.YEAR)
@@ -79,10 +77,9 @@ private fun openDialog(
             TimePickerDialog(
                 context,
                 { _, hour, minute ->
-                    dateSelectionState.value = true
                     val calendar = Calendar.getInstance()
                     calendar.set(year, month, day, hour, minute)
-                    date.value = calendar.timeInMillis
+                    onChange(true, calendar.timeInMillis)
                 },
                 startHour, startMinute, false,
             ).show()

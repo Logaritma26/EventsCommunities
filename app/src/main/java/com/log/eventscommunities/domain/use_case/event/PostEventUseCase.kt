@@ -1,17 +1,19 @@
-package com.log.eventscommunities.domain.use_case.home
+package com.log.eventscommunities.domain.use_case.event
 
 import com.log.eventscommunities.domain.model.Event
-import com.log.eventscommunities.domain.repository.HomeRepository
+import com.log.eventscommunities.domain.model.FunctionResponse
+import com.log.eventscommunities.domain.repository.EventRepository
 import com.log.eventscommunities.domain.wrappers.Resource
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
 import javax.inject.Inject
 
 
 class PostEventUseCase @Inject constructor(
-    private val repository: HomeRepository,
+    private val repository: EventRepository,
 ) {
-    suspend operator fun invoke(event: Event): Flow<Resource<Any>> {
+    suspend operator fun invoke(
+        event: Event
+    ): Flow<Resource<FunctionResponse>> {
         val data = hashMapOf(
             "title" to event.title,
             "description" to event.description,
@@ -21,7 +23,6 @@ class PostEventUseCase @Inject constructor(
             "organizer" to event.organizer.organizer,
             "organizerName" to event.organizer.organizerName,
         )
-        Timber.d("asdf organizer name: ${event.organizer.organizerName}")
         return repository.postEvent(data = data)
     }
 }

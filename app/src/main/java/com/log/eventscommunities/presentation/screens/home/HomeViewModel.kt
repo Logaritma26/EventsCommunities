@@ -10,9 +10,9 @@ import com.log.eventscommunities.domain.use_case.auth.FetchUserUseCase
 import com.log.eventscommunities.domain.use_case.auth.ReloadAuthUseCase
 import com.log.eventscommunities.domain.use_case.auth.SendVerificationUseCase
 import com.log.eventscommunities.domain.use_case.auth.SignOutUseCase
-import com.log.eventscommunities.domain.use_case.home.FilterEventsUseCase
-import com.log.eventscommunities.domain.use_case.home.GetEventsUseCase
-import com.log.eventscommunities.domain.use_case.home.PostEventUseCase
+import com.log.eventscommunities.domain.use_case.event.FilterEventsUseCase
+import com.log.eventscommunities.domain.use_case.event.GetEventsUseCase
+import com.log.eventscommunities.domain.use_case.event.PostEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

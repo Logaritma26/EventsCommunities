@@ -21,6 +21,7 @@ fun EventList(
     events: List<Event>,
     isLoading: Boolean,
     setFilter: (Int) -> Unit,
+    goEventDetail: (Event) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -37,7 +38,10 @@ fun EventList(
                 )
             }
             itemsIndexed(events) { index, event ->
-                EventCard(event = event)
+                EventCard(
+                    event = event,
+                    goEventDetail = { detailEvent -> goEventDetail(detailEvent) },
+                )
                 if (index != events.lastIndex) {
                     Divider(modifier = Modifier.padding(horizontal = 32.dp))
                 }

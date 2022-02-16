@@ -32,27 +32,31 @@ fun UserProfile(
                         .fillMaxWidth()
                         .background(color = Creme)
                 ) {
-                    var name: String = user.displayName ?: ""
-                    if (name.isEmpty()) {
-                        name = user.email!!
+                    val name = if (user.displayName.isNullOrBlank()) {
+                        user.email!!
+                    } else {
+                        user.displayName!!
                     }
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(horizontal = 24.dp),
-                        text = name,
-                        color = Black,
-                    )
-                    if (user.isEmailVerified) {
-                        Icon(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .padding(horizontal = 24.dp),
-                            imageVector = Icons.Rounded.Verified,
-                            contentDescription = "Verified Icon",
-                            tint = VerifiedBlue,
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            text = name,
+                            color = Black,
                         )
+                        if (user.isEmailVerified) {
+                            Icon(
+                                modifier = Modifier.padding(horizontal = 24.dp),
+                                imageVector = Icons.Rounded.Verified,
+                                contentDescription = "Verified Icon",
+                                tint = VerifiedBlue,
+                            )
+                        }
                     }
+
                 }
                 if (!user.isEmailVerified) {
                     ProfileTile(
@@ -60,7 +64,6 @@ fun UserProfile(
                         onClick = { verifyMe() }
                     )
                 }
-                ProfileTile(text = "Attending Events")
                 ProfileTile(
                     text = "Sign Out",
                     onClick = { signOut() }
