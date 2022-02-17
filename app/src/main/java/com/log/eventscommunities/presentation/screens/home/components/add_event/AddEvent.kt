@@ -5,17 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseUser
 import com.log.eventscommunities.domain.model.Event
 import com.log.eventscommunities.domain.model.Organizer
-import com.log.eventscommunities.presentation.util.common_composables.text_field.TextFieldState
 import com.log.eventscommunities.ui.theme.picList
 
 @ExperimentalAnimationApi
@@ -28,11 +24,12 @@ fun AddEvent(
     user: FirebaseUser?,
     notAuthenticatedRedirection: () -> Unit,
 ) {
-    val state = rememberAddEventState()
+    var state by remember { mutableStateOf(AddEventState()) }
 
     PeekBox(
         onClickCollapse = { onClickCollapse() },
         isCollapsed = isCollapsed,
+        user = user,
     )
 
     Column(
@@ -48,17 +45,29 @@ fun AddEvent(
             descState = state.descriptionState,
             locationState = state.locationState,
         )
-        DateSelector(selected = state.dateSelectionState, date = state.dateState)
+        DateSelector(
+            selected = state.dateSelectionState,
+            date = state.dateState,
+            onChange = { selected, date ->
+                state = state.copy(
+                    dateSelectionState = selected,
+                    dateState = date,
+                )
+            }
+        )
         TagSelector(
-            selectedIndex = state.picState.value,
-            onPicSelected = { pic -> state.picState.value = pic },
+            selectedIndex = state.picState,
+            onPicSelected = { pic -> state = state.copy(picState = pic) },
         )
         Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = {
                 submitFunction(
                     onClickCollapse = onClickCollapse,
-                    onSendEvent = onSendEvent,
+                    onSendEvent = {
+                        onSendEvent(it)
+                        state = AddEventState()
+                    },
                     user = user,
                     notAuthenticatedRedirection = notAuthenticatedRedirection,
                     state = state,
@@ -88,59 +97,17 @@ private fun submitFunction(
                 title = state.titleState.text,
                 description = state.descriptionState.text,
                 location = state.locationState.text,
-                tag = picList.values.indexOf(state.picState.value),
-                time = state.dateState.value,
+                tag = picList.values.indexOf(state.picState),
+                time = state.dateState,
                 organizer = Organizer(
                     organizer = user.uid,
                     organizerName = organizerName
                 )
             )
             onSendEvent(event)
-            state.reset()
             onClickCollapse()
         }
     } else {
         notAuthenticatedRedirection()
     }
-}
-
-// TODO convert to separated data class state
-class AddEventState(
-    val titleState: TextFieldState,
-    val descriptionState: TextFieldState,
-    val locationState: TextFieldState,
-    val dateState: MutableState<Long>,
-    val dateSelectionState: MutableState<Boolean>,
-    val picState: MutableState<Int>,
-) {
-    fun validate(): Boolean {
-        return titleState.validate() && descriptionState.validate() && locationState.validate() && dateSelectionState.value
-    }
-
-    fun reset() {
-        titleState.text = ""
-        descriptionState.text = ""
-        locationState.text = ""
-        dateState.value = 0L
-        picState.value = 1
-    }
-}
-
-@Composable
-private fun rememberAddEventState(
-    titleState: TextFieldState = remember { TextFieldState(pHint = "Title") },
-    descriptionState: TextFieldState = remember { TextFieldState(pHint = "Description") },
-    locationState: TextFieldState = remember { TextFieldState(pHint = "Location") },
-    dateState: MutableState<Long> = remember { mutableStateOf(0L) },
-    dateSelectionState: MutableState<Boolean> = remember { mutableStateOf(false) },
-    picState: MutableState<Int> = remember { mutableStateOf(1) },
-) = remember(titleState, descriptionState, locationState, dateState, dateSelectionState, picState) {
-    AddEventState(
-        titleState,
-        descriptionState,
-        locationState,
-        dateState,
-        dateSelectionState,
-        picState,
-    )
 }

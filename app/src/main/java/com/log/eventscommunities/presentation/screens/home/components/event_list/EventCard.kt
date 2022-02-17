@@ -3,6 +3,7 @@ package com.log.eventscommunities.presentation.screens.home.components.event_lis
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,9 +21,11 @@ import com.log.eventscommunities.ui.theme.picList
 import java.text.SimpleDateFormat
 import java.util.*
 
+@ExperimentalMaterialApi
 @Composable
 fun EventCard(
-    event: Event
+    event: Event,
+    goEventDetail: (Event) -> Unit,
 ) {
     val pics = picList.values.toList()
 
@@ -38,6 +41,7 @@ fun EventCard(
                 modifier = Modifier
                     .padding(16.dp),
                 shape = Shapes.small,
+                onClick = { goEventDetail(event) }
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

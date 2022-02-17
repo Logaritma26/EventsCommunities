@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.log.eventscommunities.presentation.screens.destinations.AuthScreenDestination
+import com.log.eventscommunities.presentation.screens.destinations.EventDetailDestination
 import com.log.eventscommunities.presentation.screens.home.components.drawer.Drawer
 import com.log.eventscommunities.presentation.screens.home.components.event_list.EventList
 import com.log.eventscommunities.presentation.screens.home.components.add_event.AddEvent
@@ -29,6 +30,7 @@ fun HomeScreen(
     navigator: DestinationsNavigator,
 ) {
     val state = viewModel.homeState
+    val sheetEnabled = !state.isLoading() && state.user != null && state.user.isEmailVerified
 
     LaunchedEffect(key1 = true) {
         viewModel.reloadAuth()
@@ -50,7 +52,7 @@ fun HomeScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text("App Name") }
+                title = { Text("Uni Events") }
             )
         },
         drawerContent = {
@@ -63,7 +65,7 @@ fun HomeScreen(
         },
         drawerShape = Sharp.copy(bottomEnd = CornerSize(24.dp)),
         drawerGesturesEnabled = !state.isLoading(),
-        sheetGesturesEnabled = !state.isLoading(),
+        sheetGesturesEnabled = sheetEnabled,
         sheetElevation = 16.dp,
         sheetShape = Shapes.medium,
         sheetBackgroundColor = Creme,
@@ -73,7 +75,7 @@ fun HomeScreen(
                 onClickCollapse = {
                     onClickCollapse(
                         scaffoldState = scaffoldState,
-                        isLoading = state.isLoading(),
+                        sheetEnabled = sheetEnabled,
                         scope = scope,
                     )
                 },
@@ -88,6 +90,9 @@ fun HomeScreen(
             events = if (state.filter.value == -1) state.eventList else state.filteredList,
             isLoading = state.isLoading(),
             setFilter = { selected -> state.filter.value = selected },
+            goEventDetail = { event ->
+                navigator.navigate(EventDetailDestination(event = event))
+            },
         )
     }
 }
@@ -95,11 +100,11 @@ fun HomeScreen(
 @ExperimentalMaterialApi
 private fun onClickCollapse(
     scaffoldState: BottomSheetScaffoldState,
-    isLoading: Boolean,
+    sheetEnabled: Boolean,
     scope: CoroutineScope,
 ) {
     if (scaffoldState.bottomSheetState.isCollapsed) {
-        if (!isLoading) {
+        if (sheetEnabled) {
             scope.launch { scaffoldState.bottomSheetState.expand() }
         }
     } else {
